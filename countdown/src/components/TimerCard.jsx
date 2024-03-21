@@ -1,8 +1,8 @@
 import React from "react";
 
-function TimerCard() {
+function TimerCard({ time }) {
   return (
-    <div className="border-2 border-white h-[96px] w-[96px] m-2">Time</div>
+    <div className="border-2 border-white h-[96px] w-[96px] m-2">{time}</div>
   );
 }
 
