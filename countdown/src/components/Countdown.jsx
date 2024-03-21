@@ -12,10 +12,33 @@ function Countdown() {
   const [selected, setSelected] = useState(null);
   const [total, setTotal] = useState(null);
   const [running, setRunning] = useState(false);
+  const [done, setDone] = useState(null);
+
+  const [error, setError] = useState("");
 
   const handleStartTimer = () => {
-    calculate();
-    setRunning(true);
+    if (validate()) {
+      calculate();
+      setRunning(true);
+    }
+  };
+
+  const validate = () => {
+    const current = new Date();
+    const daysDiff = (selected - current) / (1000 * 60 * 60 * 24);
+    console.log(daysDiff);
+    if (!selected) {
+      setError("Please select the date/time from above calender");
+      return false;
+    } else if (selected <= current) {
+      setError("Selected date/time cannot be less than now.");
+      return false;
+    } else if (daysDiff > 99) {
+      setError("Countdown cannot be set for more than 99 days.");
+      return false;
+    } else {
+      return true;
+    }
   };
 
   const updateCountdown = () => {
@@ -68,7 +91,9 @@ function Countdown() {
       updateCountdown();
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+    };
   }, [total, running]);
 
   return (
@@ -81,14 +106,30 @@ function Countdown() {
 
       {!running ? (
         <button
-          className="bg-inherit  hover:bg-violet-700 hover:text-white border-2 border-slate-400 rounded m-2 p-2 w-[120px]"
+          className="bg-inherit  hover:bg-green-700 hover:text-white border-2 border-slate-400 rounded m-2 p-2 w-[120px]"
           onClick={handleStartTimer}
         >
           {" "}
           <h1 className="text-md md:text-lg text-white"> Start</h1>
         </button>
       ) : (
-        <button onClick={handleStopTimer}> Stop</button>
+        <button
+          className="bg-inherit  hover:bg-red-700 hover:text-white border-2 border-slate-400 rounded m-2 p-2 w-[120px]"
+          onClick={handleStopTimer}
+        >
+          {" "}
+          <h1 className="text-md md:text-lg text-white"> Stop</h1>
+        </button>
+      )}
+      
+      {done !== null ? (
+        <p className="text-green-500"> Timer is complete!</p>
+      ) : (
+        <></>
+      )}
+
+      {error && !running && (
+        <p className="text-sm md:text-lg text-red-100"> {error}</p>
       )}
 
       <div className="flex w-full justify-between items-center">
