@@ -3,12 +3,19 @@ import DateTimePicker from "react-datetime-picker";
 import TimerCard from "./TimerCard";
 
 function Countdown() {
-  const [countdown, setCountdown] = useState(null);
+  const [countdown, setCountdown] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
   const [selected, setSelected] = useState(null);
   const [total, setTotal] = useState(null);
+  const [running, setRunning] = useState(false);
 
   const handleStartTimer = () => {
     calculate();
+    setRunning(true);
   };
 
   const updateCountdown = () => {
@@ -27,6 +34,12 @@ function Countdown() {
 
       setCountdown({ days, hours, minutes, seconds });
     }
+  };
+
+  const handleStopTimer = () => {
+    setRunning(false);
+    setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+    setSelected(null);
   };
 
   const calculate = () => {
@@ -48,32 +61,48 @@ function Countdown() {
 
   useEffect(() => {
     const timer = setInterval(() => {
+      if (!running) {
+        clearInterval(timer);
+        return;
+      }
       updateCountdown();
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [total]);
-
-  console.log(countdown);
+  }, [total, running]);
 
   return (
-    <div>
-      <DateTimePicker onChange={setSelected} value={selected} />
+    <div className="flex flex-col justify-between items-center   h-full">
+      <DateTimePicker
+        className="border-2 border-white"
+        onChange={setSelected}
+        value={selected}
+      />
 
-      <button onClick={handleStartTimer}> Start</button>
+      {!running ? (
+        <button
+          className="bg-inherit  hover:bg-violet-700 hover:text-white border-2 border-slate-400 rounded m-2 p-2 w-[120px]"
+          onClick={handleStartTimer}
+        >
+          {" "}
+          <h1 className="text-md md:text-lg text-white"> Start</h1>
+        </button>
+      ) : (
+        <button onClick={handleStopTimer}> Stop</button>
+      )}
 
       <div className="flex w-full justify-between items-center">
         <div>
-          <TimerCard time={countdown?.days} />
+          <TimerCard time={countdown?.days} title={"Days"} />
         </div>
         <div>
-          <TimerCard time={countdown?.hours} />
+          <TimerCard time={countdown?.hours} title={"Hours"} />
         </div>
         <div>
-          <TimerCard time={countdown?.minutes} />
+          <TimerCard time={countdown?.minutes} title={"Minutes"} />
         </div>
         <div>
-          <TimerCard time={countdown?.seconds} />
+          <TimerCard time={countdown?.seconds} title={"Seconds"} />
         </div>
       </div>
     </div>
