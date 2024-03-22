@@ -18,8 +18,10 @@ function Countdown() {
 
   const handleStartTimer = () => {
     if (validate()) {
+      setDone(false);
       calculate();
       setRunning(true);
+      setError("");
     }
   };
 
@@ -63,6 +65,7 @@ function Countdown() {
     setRunning(false);
     setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     setSelected(null);
+    setError("");
   };
 
   const calculate = () => {
@@ -96,6 +99,13 @@ function Countdown() {
     };
   }, [total, running]);
 
+  useEffect(() => {
+    if (total <= 0) {
+      setDone(true);
+      setRunning(false);
+    }
+  }, [total]);
+
   return (
     <div className="flex flex-col justify-between items-center   h-full">
       <DateTimePicker
@@ -120,12 +130,6 @@ function Countdown() {
           {" "}
           <h1 className="text-md md:text-lg text-white"> Stop</h1>
         </button>
-      )}
-      
-      {done !== null ? (
-        <p className="text-green-500"> Timer is complete!</p>
-      ) : (
-        <></>
       )}
 
       {error && !running && (
